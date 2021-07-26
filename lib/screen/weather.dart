@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 /*import 'package:geolocator/geolocator.dart';
 import "package:http/http.dart" as http;
 import 'dart:convert';*/
-import 'package:weather/data/location_model.dart';
-import 'package:weather/data/network.dart';
+import 'package:weather/model/location_model.dart';
+import 'package:weather/model/network_model.dart';
 
 const apiKey = 'd07fdfb142d541d6e4e7b97d909e7e3a';
 
