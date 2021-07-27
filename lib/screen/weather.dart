@@ -1,89 +1,258 @@
+import 'package:weather/model/weather_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-/*import 'package:geolocator/geolocator.dart';
-import "package:http/http.dart" as http;
-import 'dart:convert';*/
-import 'package:weather/model/location_model.dart';
-import 'package:weather/model/network_model.dart';
-
-const apiKey = 'd07fdfb142d541d6e4e7b97d909e7e3a';
+import 'package:flutter/painting.dart';
+import 'package:timer_builder/timer_builder.dart';
+import 'package:intl/intl.dart';
 
 class WeatherPage extends StatefulWidget {
+  WeatherPage({this.parseWeatherData, this.parseAirData});
+
+  final dynamic parseWeatherData;
+  final dynamic parseAirData;
 
   @override
   _WeatherPageState createState() => _WeatherPageState();
 }
 
 class _WeatherPageState extends State<WeatherPage> {
-
-  double? latitude;
-  double? longitude;
+  WeatherModel weatherModel = WeatherModel();
   dynamic weatherData;
   String? cityName;
+  String? description;
   int? cityTemp;
+  var date = DateTime.now();
+  late Widget icon;
+  late Widget airIcon;
+  late Widget airStateText;
+  double? dust;
+  double? ultraDust;
 
   @override
   void initState() {
     super.initState();
-    getLocation();
-    updateData(weatherData);
+    updateData(widget.parseWeatherData, widget.parseAirData);
   }
 
-  void updateData(dynamic weatherData) {
-
+  void updateData(dynamic weatherData, dynamic airData) {
+    double? tempD = weatherData['main']['temp'];
+    int condition = weatherData['weather'][0]['id'];
+    int index = airData['list'][0]['main']['aqi'];
+    cityTemp = tempD!.round();
     cityName = weatherData['name'];
-    double cityTemp2 = weatherData['main']['temp'];
-    cityTemp = cityTemp2.round();
+    icon = weatherModel.getWeatherIcon(condition)!;
+    description = weatherData['weather'][0]['description'];
+    airIcon = weatherModel.getAirIcon(index);
+    airStateText = weatherModel.getAirCondition(index);
+    dust = airData['list'][0]['components']['pm10'];
+    ultraDust = airData['list'][0]['components']['pm2_5'];
   }
 
-  void getLocation() async{
-    LocationModel locationModel = LocationModel();
-    await locationModel.getCurrentLocation();
-    latitude = locationModel.latitude;
-    longitude = locationModel.longitude;
-
-    String openweatherUrl = 'https://api.openweathermap.org/data/2.5/weather'
-        '?lat=$latitude&lon=$longitude&appid=$apiKey&units=metric';
-
-    Network network = Network(openweatherUrl);
-
-    weatherData = await network.getJsonData();
-    print('weat$weatherData');
+  String getSystemTime() {
+    var nowTime = DateTime.now();
+    return DateFormat("h:mm a").format(nowTime);
   }
-  
-/*  void fetchData() async{
-    http.Response response = await http.get(Uri.parse('https://samples.openweathermap.org/data/2.5/weather?q=London&appid=b1b15e88fa797225412429c1c50c122a1'));
-
-    if(response.statusCode == 200) {
-      String jsonData = response.body;
-      var parsingData = jsonDecode(jsonData);
-      var myJson = jsonDecode(jsonData)['weather'][0]['description'];
-      print(myJson);
-    }
-    else {
-      print(response.statusCode);
-    }
-  }*/
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
+        leading: null,
+      ),
+      backgroundColor: Colors.lightBlue,
       body: Container(
+        padding: EdgeInsets.all(20.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              '$cityName',
-              style: TextStyle(
-                fontSize: 30.0
+            Expanded(
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 100.0,
+                  ),
+                  Text(
+                    cityName!,
+                    style: const TextStyle(
+                      fontSize: 35.0,
+                      fontFamily: 'Godo',
+                      color: Colors.white,
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TimerBuilder.periodic(
+                        (const Duration(minutes: 1)),
+                        builder: (context) {
+                          return Text('${getSystemTime()}',
+                              style: const TextStyle(
+                                fontSize: 15.0,
+                                fontFamily: 'Godo',
+                                color: Colors.white,
+                              ));
+                        },
+                      ),
+                      Text(
+                        DateFormat(' - EEEE').format(date),
+                        style: const TextStyle(
+                          fontSize: 15.0,
+                          fontFamily: 'Godo',
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        DateFormat(', d MMM, yyy').format(date),
+                        style: const TextStyle(
+                          fontSize: 15.0,
+                          fontFamily: 'Godo',
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(top: 20.0, bottom: 20.0),
+                    child: Column(
+                      children: [
+                        Text(description!,
+                            style: const TextStyle(
+                              fontSize: 16.0,
+                              fontFamily: 'Godo',
+                              color: Colors.white,
+                            )),
+                        const SizedBox(
+                          height: 30.0,
+                        ),
+                        icon,
+                      ],
+                    ),
+                  ),
+                  Text(
+                    '$cityTemp \u2103',
+                    style: const TextStyle(
+                      fontSize: 50.0,
+                      fontFamily: 'Godo',
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
-            Text(
-              '$cityTemp',
-              style: TextStyle(
-                fontSize: 30.0
-              ),
-            )
+            Column(
+              children: [
+                const Divider(
+                  height: 15.0,
+                  thickness: 2.0,
+                  color: Colors.white30,
+                ),
+                const SizedBox(
+                  height: 5.0,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        const Text(
+                          'AQI',
+                          style: TextStyle(
+                            fontFamily: 'Godo',
+                            fontSize: 16.0,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 5.0,
+                        ),
+                        airIcon,
+                        const SizedBox(
+                          height: 5.0,
+                        ),
+                        airStateText,
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        const Text(
+                          'MicroDust',
+                          style: TextStyle(
+                            fontFamily: 'Godo',
+                            fontSize: 16.0,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 5.0,
+                        ),
+                        Text(
+                          '$dust',
+                          style: const TextStyle(
+                            fontFamily: 'Godo',
+                            fontSize: 16.0,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 5.0,
+                        ),
+                        const Text(
+                          '㎍/m3',
+                          style: TextStyle(
+                              fontFamily: 'Godo',
+                              fontSize: 16.0,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Ultra\nMicroDust',
+                          style: TextStyle(
+                            fontFamily: 'Godo',
+                            fontSize: 16.0,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(
+                          height: 5.0,
+                        ),
+                        Text(
+                          '$ultraDust',
+                          style: const TextStyle(
+                            fontFamily: 'Godo',
+                            fontSize: 16.0,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 5.0,
+                        ),
+                        const Text(
+                          '㎍/m3',
+                          style: TextStyle(
+                              fontFamily: 'Godo',
+                              fontSize: 16.0,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 5.0,
+                ),
+              ],
+            ),
           ],
         ),
       ),

@@ -1,5 +1,5 @@
 name: weather
-description: A new Flutter project.
+description: This is a Weather Application.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -37,10 +37,20 @@ dependencies:
   geolocator: ^7.3.1
   http: ^0.13.3
   fluttertoast: ^8.0.7
+  timer_builder: ^2.0.0
+  intl: ^0.17.0
+  flutter_svg: ^0.22.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  flutter_launcher_icons: ^0.9.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "icon/app-icon.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -59,6 +69,17 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - images/
+    - svg/
+
+fonts:
+  - family: Godo
+    fonts:
+      - asset: fonts/godo_m.ttf
+        weight: 30.0
+      - asset: fonts/godo_b.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

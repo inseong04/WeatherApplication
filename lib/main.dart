@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:weather/screen/weather.dart';
+import 'package:weather/screen/splash.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: WeatherPage(),
+      home: SplashPage(),
     );
   }
 }

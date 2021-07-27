@@ -5,7 +5,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class Network {
   final String url;
-  Network(this.url);
+  final String airUrl;
+
+  Network(this.url, this.airUrl);
 
   Future<dynamic> getJsonData() async {
     http.Response response = await http.get(Uri.parse(url));
@@ -14,8 +16,7 @@ class Network {
       String jsonData = response.body;
       var parsingData = jsonDecode(jsonData);
       return parsingData;
-    }
-    else {
+    } else {
       Fluttertoast.showToast(
           msg: "에러가 발생했습니다.",
           toastLength: Toast.LENGTH_SHORT,
@@ -23,9 +24,26 @@ class Network {
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.red,
           textColor: Colors.white,
-          fontSize: 16.0
-      );
+          fontSize: 16.0);
     }
+  }
 
+  Future<dynamic> getAirData() async {
+    http.Response response = await http.get(Uri.parse(airUrl));
+
+    if (response.statusCode == 200) {
+      String jsonData = response.body;
+      var parsingData = jsonDecode(jsonData);
+      return parsingData;
+    } else {
+      Fluttertoast.showToast(
+          msg: "에러가 발생했습니다.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
   }
 }
